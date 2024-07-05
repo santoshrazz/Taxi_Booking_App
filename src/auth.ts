@@ -2,7 +2,9 @@ import NextAuth, { CredentialsSignin } from "next-auth";
 import credentials from "next-auth/providers/credentials";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
-
+import { connectToDb } from "./Db/db.config";
+import { UserModel } from "./models/user.model";
+import bcryptjs from "bcryptjs";
 export const { auth, handlers, signIn, signOut } = NextAuth({
   providers: [
     GitHub,
@@ -21,16 +23,26 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         },
       },
       async authorize(credentials) {
-        const { email, password } = credentials;
+        // const { email, password } = credentials;
+        const email = credentials.email as string;
+        const password = credentials.password as string;
+        if (!email || !password) {
+          throw new Error("All fields require");
+        }
         try {
-          if (!email || !password) {
-            throw new Error("All fields require");
+          await connectToDb();
+          const user = await UserModel.findOne({ email });
+          if (!user) {
+            throw new Error("No user exists");
           }
-          if (email === "santoshrajbgp11@gmail.com") {
-            return { id: "1", name: "Santosh" };
-          } else {
-            throw new Error("No user found with this email");
+          const isPasswordCorrect = await bcryptjs.compare(
+            password,
+            user.password
+          );
+          if (!isPasswordCorrect) {
+            throw new Error("User password incorrect");
           }
+          return user;
         } catch (error: any) {
           throw new Error(error.message);
         }

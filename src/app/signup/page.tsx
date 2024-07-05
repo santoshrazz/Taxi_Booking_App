@@ -1,85 +1,138 @@
-import React from "react";
+"use client";
+import { signUpForm } from "@/types/types";
+import React, { ChangeEvent, FormEvent, useState } from "react";
+import { signupUser } from "../actions/user.action";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const page = () => {
+  const router = useRouter();
+  const [formData, setformData] = useState<signUpForm>({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setformData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
+    // Client side validation
+    if (
+      formData.name === "" ||
+      formData.email === "" ||
+      formData.password === "" ||
+      formData.confirmPassword === ""
+    ) {
+      return toast.error("All fields are require");
+    }
+    if (formData.confirmPassword != formData.password) {
+      return toast.error("Password and confirm password does't match");
+    }
+    const response = await signupUser(formData);
+    if (response.success) {
+      toast.success(response.message);
+      setformData({ name: "", password: "", email: "", confirmPassword: "" });
+      router.push("/login");
+    } else {
+      toast.error(
+        response?.response?.data?.message || "Error while creating user account"
+      );
+    }
+  };
   return (
-    <body className="bg-white">
-      <div className="flex min-h-screen bg-white">
-        <div
-          className="w-1/2 bg-cover md:block hidden"
-          style={{
-            backgroundImage:
-              "url(https://images.unsplash.com/photo-1520243947988-b7b79f7873e9?ixid=MXwxMjA3fDB8MHxzZWFyY2h8NDd8fGJsYWNrJTIwZm9yZXN0fGVufDB8fDB8eWVsbG93&ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=60)",
-          }}
-        ></div>
-        <div className="bg-no-repeat bg-right bg-cover max-w-max max-h-8 h-12 overflow-hidden">
-          <img src="log_in.webp" alt="hey" />
+    <div className="absolute top-0 z-[-2] w-full bg-[rgb(0,0,0)] bg-[radial-gradient(#ffffff33_1px,#00091d_1px)] bg-[size:20px_20px] h-screen">
+      <div className="max-w-md mx-auto mt-10 bg-white shadow-lg rounded-lg overflow-hidden">
+        <div className="text-2xl py-4 px-6 bg-gray-900 text-white text-center font-bold uppercase">
+          Create Your Account
         </div>
-
-        <div className="md:w-1/2 max-w-lg mx-auto my-24 px-4 py-5 shadow-none">
-          <div className="text-left p-0 font-sans">
-            <h1 className=" text-gray-800 text-3xl font-medium">
-              Create an account for free
-            </h1>
-            <h3 className="p-1 text-gray-700">
-              Free forever. No payment needed.
-            </h3>
+        <form className="py-4 px-6" onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 font-bold mb-2"
+              htmlFor="name"
+            >
+              Name
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="name"
+              type="text"
+              name="name"
+              onChange={handleInputChange}
+              value={formData.name}
+              placeholder="Enter your name"
+            />
           </div>
-          <form action="#" className="p-0">
-            <div className="mt-5">
-              <label htmlFor="email" className="sc-bqyKva ePvcBv">
-                Email
-              </label>
-              <input
-                type="text"
-                className="block w-full p-2 border rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-transparent "
-                placeholder="Email"
-              />
-            </div>
-            <div className="mt-5">
-              <input
-                type="text"
-                className="block w-full p-2 border rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-transparent "
-                placeholder="User-name"
-              />
-            </div>
-            <div className="mt-5">
-              <input
-                type="password"
-                className="block w-full p-2 border rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-transparent  "
-                placeholder="Password"
-              />
-            </div>
-
-            <div className="mt-6 block p-5 text-sm md:font-sans  text-gray-800">
-              <input type="checkbox" className="inline-block border-0  " />
-              <span className="">
-                By creating an account you are agreeing to our
-                <a className="" href="#" target="_blank" data-test="Link">
-                  <span className="underline ">Terms and Conditions</span>{" "}
-                </a>{" "}
-                and
-                <a className="" href="#" target="_blank" data-test="Link">
-                  <span className="underline">Privacy Policy</span>{" "}
-                </a>
-              </span>
-            </div>
-
-            <div className="mt-10">
-              <input
-                type="submit"
-                value="Sign up with email"
-                className="py-3 bg-green-500 text-white w-full rounded hover:bg-green-600"
-              />
-            </div>
-          </form>
-          <a className="" href="#" data-test="Link">
-            <span className="block  p-5 text-center text-gray-800  text-xs ">
-              Already have an account?
-            </span>
-          </a>
-        </div>
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 font-bold mb-2"
+              htmlFor="email"
+            >
+              Email
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="email"
+              name="email"
+              onChange={handleInputChange}
+              value={formData.email}
+              type="email"
+              placeholder="Enter your email"
+            />
+          </div>
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 font-bold mb-2"
+              htmlFor="password"
+            >
+              Password
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="password"
+              type="password"
+              name="password"
+              onChange={handleInputChange}
+              value={formData.password}
+              placeholder="Password"
+            />
+          </div>
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 font-bold mb-2"
+              htmlFor="phone"
+            >
+              Confirm Password
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="confirmPassword"
+              type="password"
+              placeholder="Confirm Password"
+              name="confirmPassword"
+              onChange={handleInputChange}
+              value={formData.confirmPassword}
+            />
+          </div>
+          <div className="flex items-center justify-center mb-4">
+            <button
+              className="bg-gray-900 text-white py-2 px-4 rounded hover:bg-gray-800 focus:outline-none focus:shadow-outline"
+              type="submit"
+            >
+              Sign Up
+            </button>
+          </div>
+        </form>
       </div>
-    </body>
+    </div>
   );
 };
 

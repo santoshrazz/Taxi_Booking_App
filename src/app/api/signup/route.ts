@@ -1,7 +1,7 @@
 import { connectToDb } from "@/Db/db.config";
 import { UserModel } from "@/models/user.model";
 import { NextRequest, NextResponse } from "next/server";
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 export const POST = async (req: NextRequest) => {
   connectToDb();
   try {
@@ -28,7 +28,7 @@ export const POST = async (req: NextRequest) => {
       );
     }
     // Hashing password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcryptjs.hash(password, 10);
 
     //----------> Creating New user <-----------
     const newUser = await UserModel.create({
