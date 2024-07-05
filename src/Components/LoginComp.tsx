@@ -3,7 +3,7 @@ import Link from "next/link";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { loginToUser } from "@/app/actions/user.action";
+import { loginToUser, loginWithGoogle } from "@/app/actions/user.action";
 
 const LoginComp = () => {
   const [email, setEmail] = useState("");
@@ -23,6 +23,9 @@ const LoginComp = () => {
       console.log(`Error while trying to loggin in`, error);
     }
   };
+  const handleGoogleLogin = async () => {
+    await loginWithGoogle();
+  };
   return (
     <div className="py-16">
       <div className="flex bg-white rounded-lg shadow-lg overflow-hidden mx-auto max-w-sm lg:max-w-4xl">
@@ -38,9 +41,9 @@ const LoginComp = () => {
             Brand
           </h2>
           <p className="text-xl text-gray-600 text-center">Welcome back!</p>
-          <Link
-            href="/"
-            className="flex items-center justify-center mt-4 text-white rounded-lg shadow-md hover:bg-gray-100"
+          <div
+            className="flex cursor-pointer items-center justify-center mt-4 text-white rounded-lg shadow-md hover:bg-gray-100"
+            onClick={handleGoogleLogin}
           >
             <div className="px-4 py-3">
               <svg className="h-6 w-6" viewBox="0 0 40 40">
@@ -65,7 +68,7 @@ const LoginComp = () => {
             <h1 className="px-4 py-3 w-5/6 text-center text-gray-600 font-bold">
               Sign in with Google
             </h1>
-          </Link>
+          </div>
           <div className="mt-4 flex items-center justify-between">
             <span className="border-b w-1/5 lg:w-1/4"></span>
             <a href="#" className="text-xs text-center text-gray-500 uppercase">

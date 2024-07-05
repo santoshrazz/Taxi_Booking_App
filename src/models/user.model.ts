@@ -10,6 +10,8 @@ interface RIDE extends Document {
 interface USER extends Document {
   name: string;
   email: string;
+  googleId: string;
+  imageAvatar: string;
   password: string;
   ride: RIDE[];
 }
@@ -37,6 +39,12 @@ const RideSchema: Schema<RIDE> = new Schema({
 });
 const UserSchema: Schema<USER> = new Schema({
   name: { type: String, required: true },
+  googleId: {
+    type: String,
+  },
+  imageAvatar: {
+    type: String,
+  },
   email: {
     type: String,
     required: true,
@@ -45,7 +53,6 @@ const UserSchema: Schema<USER> = new Schema({
   },
   password: {
     type: String,
-    required: true,
   },
   ride: [],
 });

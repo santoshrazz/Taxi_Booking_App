@@ -33,3 +33,12 @@ export const loginToUser = async ({
   });
   return loginResponse;
 };
+
+export const loginWithGoogle = async () => {
+  try {
+    const response = await signIn("google");
+    console.log(response);
+  } catch (error) {
+    console.log("error in login with google", error);
+  }
+};

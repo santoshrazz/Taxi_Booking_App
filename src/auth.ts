@@ -8,7 +8,10 @@ import bcryptjs from "bcryptjs";
 export const { auth, handlers, signIn, signOut } = NextAuth({
   providers: [
     GitHub,
-    Google,
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
     credentials({
       credentials: {
         email: {
@@ -54,6 +57,32 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   },
   pages: {
     signIn: "/login",
+  },
+  callbacks: {
+    signIn: async ({ user, account }) => {
+      if (account?.provider === "google") {
+        const { name, email, image, id } = user;
+        console.log("user email is ", email);
+        try {
+          await connectToDb();
+          const isUserExists = await UserModel.findOne({ email });
+          if (!isUserExists) {
+            await UserModel.create({
+              name,
+              email,
+              googleId: id,
+              imageAvatar: image,
+            });
+          }
+          return true;
+          // return true;
+        } catch (error: any) {
+          console.log(`Error in google signin`, error);
+          return false;
+        }
+      }
+      return false;
+    },
   },
   secret: "secretisNextAuthSecret",
 });

@@ -1,6 +1,5 @@
 import { auth } from "@/auth";
 import LoginComp from "@/Components/loginComp";
-import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import React from "react";
 
